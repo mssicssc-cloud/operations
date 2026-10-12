@@ -1,0 +1,41 @@
+# Create the deployment workflow file
+@'
+name: Deploy Centaur Timekeep
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/centaur/timekeep/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact (Centaur Timekeep folder)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'apps/centaur/timekeep'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+'@ | Out-File -FilePath ".github\workflows\deploy-centaur.yml" -Encoding utf8
